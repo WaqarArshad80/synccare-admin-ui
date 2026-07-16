@@ -1,0 +1,4 @@
+node_modules/.bin/nanoid
+/node_modules
+Modernist/.DS_Store
+Modernist/templates/.DS_Store

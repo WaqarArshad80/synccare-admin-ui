@@ -1,0 +1,204 @@
+<!-- @template name="Admin shell" description="Sidebar + topbar admin app frame — dark grouped nav, roomy topbar with breadcrumb, empty content canvas ready for components" -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Modernist — Admin shell</title>
+<script src="./ds-base.js"></script>
+<style>
+/* Template scaffolding — shell geometry and web-scale sizing only; every
+   color, font, radius and shadow comes from ../../styles.css. Desktop-only
+   for now: the shell assumes a fixed 240px sidebar and a viewport wide
+   enough to hold it plus content — no mobile collapse yet. */
+:root { --sidebar-w: 240px; --topbar-h: 68px; }
+html, body { height: 100%; }
+body { margin: 0; min-width: 1040px; }
+
+.shell { display: grid; grid-template-columns: var(--sidebar-w) 1fr; min-height: 100vh; }
+
+/* — sidebar: dark/inverted for contrast against the light ground — the
+   admin chrome reads as a fixed frame, content stays on the paper token — */
+.sidebar {
+  background: var(--color-neutral-900); color: var(--color-neutral-100);
+  display: flex; flex-direction: column;
+  border-right: 2px solid var(--color-divider);
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-4);
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 18px;
+  border-bottom: 2px solid color-mix(in srgb, var(--color-neutral-100) 16%, transparent);
+}
+.sidebar-brand .mark { width: 10px; height: 10px; background: var(--color-accent); flex: none; }
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: var(--space-4) 0; }
+.nav-group + .nav-group { margin-top: var(--space-4); }
+.nav-group-label {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-neutral-100) 50%, transparent);
+  padding: 0 var(--space-4); margin: 0 0 var(--space-2);
+}
+.nav-item {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: 14px; color: color-mix(in srgb, var(--color-neutral-100) 85%, transparent);
+  text-decoration: none; border-left: 2px solid transparent;
+}
+.nav-item svg { flex: none; width: 18px; height: 18px; }
+.nav-item:hover {
+  background: color-mix(in srgb, var(--color-neutral-100) 8%, transparent);
+  color: var(--color-neutral-100);
+}
+.nav-item[aria-current='page'] {
+  color: var(--color-bg); background: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  border-left-color: var(--color-accent);
+}
+.nav-item:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+.sidebar-foot {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-4);
+  border-top: 2px solid color-mix(in srgb, var(--color-neutral-100) 16%, transparent);
+}
+.avatar {
+  width: 32px; height: 32px; flex: none; display: grid; place-items: center;
+  background: var(--color-neutral-700); color: var(--color-neutral-100);
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 13px;
+}
+.sidebar-foot .who { flex: 1; min-width: 0; }
+.sidebar-foot .name { font-size: 13px; line-height: 1.3; color: var(--color-neutral-100); }
+.sidebar-foot .role {
+  font-size: 11px; line-height: 1.3;
+  color: color-mix(in srgb, var(--color-neutral-100) 55%, transparent);
+}
+.sidebar-foot button { color: color-mix(in srgb, var(--color-neutral-100) 70%, transparent); }
+.sidebar-foot button:hover { background: color-mix(in srgb, var(--color-neutral-100) 10%, transparent); color: var(--color-neutral-100); }
+
+/* — main column — */
+.main { display: flex; flex-direction: column; min-width: 0; }
+
+.topbar {
+  display: flex; align-items: center; gap: var(--space-4);
+  min-height: var(--topbar-h); padding: 0 var(--space-6);
+  border-bottom: 2px solid var(--color-divider);
+  background: var(--color-bg);
+}
+.crumbs { display: flex; align-items: center; gap: var(--space-2); flex: 1; min-width: 0; }
+.crumbs a {
+  font-size: 13px; color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  text-decoration: none;
+}
+.crumbs a:hover { color: var(--color-accent); }
+.crumbs svg { width: 14px; height: 14px; color: color-mix(in srgb, var(--color-text) 35%, transparent); flex: none; }
+.page-title {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 20px; margin: 0;
+}
+
+/* — content canvas: empty, ready for components — a visible grid so the
+   underlying structure reads even with nothing placed in it yet — */
+.content { flex: 1; padding: var(--space-6); }
+.canvas {
+  display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-4);
+  min-height: 100%;
+}
+.slot {
+  grid-column: span 12;
+  min-height: 220px;
+  border: 1.5px dashed var(--color-divider);
+  display: grid; place-items: center;
+  color: color-mix(in srgb, var(--color-text) 40%, transparent);
+}
+.slot span {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px;
+  letter-spacing: 0.02em;
+}
+@media (min-width: 1280px) {
+  .slot.half { grid-column: span 6; }
+  .slot.third { grid-column: span 4; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand"><span class="mark"></span> Modernist Admin</div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <p class="nav-group-label">Overview</p>
+        <a class="nav-item" href="#" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          Analytics
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">Manage</p>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Users
+        </a>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>
+          Orders
+        </a>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+          Products
+        </a>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-group-label">System</p>
+        <a class="nav-item" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          Settings
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="avatar">JD</div>
+      <div class="who">
+        <div class="name">Jordan Diaz</div>
+        <div class="role">Admin</div>
+      </div>
+      <button type="button" class="btn btn-icon" aria-label="Log out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumbs">
+        <a href="#">Manage</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <h1 class="page-title">Dashboard</h1>
+      </div>
+      <button type="button" class="btn btn-secondary">Export</button>
+      <button type="button" class="btn btn-primary">New</button>
+    </header>
+
+    <main class="content">
+      <div class="canvas">
+        <div class="slot"><span>component slot — drop a page header / stat row here</span></div>
+        <div class="slot half"><span>component slot</span></div>
+        <div class="slot half"><span>component slot</span></div>
+        <div class="slot"><span>component slot — table / list</span></div>
+      </div>
+    </main>
+  </div>
+
+</div>
+
+</body>
+</html>
