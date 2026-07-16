@@ -110,3 +110,29 @@ export interface ProgressNoteType {
 
 /** Sync endpoints return either a plain message or a map of counts. */
 export type SyncResult = string | Record<string, number>;
+
+/** One org's subscription state within a webhook subscription. */
+export interface WebhookOrgSubscription {
+  action?: string;
+  orgUuid?: string;
+  status?: string;
+}
+
+/** A PCC webhook subscription (GET /syncare/pcc/webhooks/subscriptions). */
+export interface WebhookSubscription {
+  webhookSubscriptionId?: number;
+  action?: string;
+  applicationName?: string;
+  applicationType?: string;
+  status?: string;
+  username?: string;
+  endUrl?: string;
+  eventGroupList?: string[];
+  currentSubscription?: WebhookOrgSubscription[];
+  enableRoomReservationCancellation?: boolean;
+  includeDischarged?: boolean;
+  includeOutpatient?: boolean;
+  vendorExternalId?: string | null;
+  createdDate?: string;
+  revisionDate?: string;
+}

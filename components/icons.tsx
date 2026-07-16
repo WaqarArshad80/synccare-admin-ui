@@ -99,6 +99,39 @@ export const PatientIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const PillIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+    <path d="m8.5 8.5 7 7" />
+  </Icon>
+);
+
+export const ObservationIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+  </Icon>
+);
+
+export const NotesIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+    <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+    <path d="M8 13h8" />
+    <path d="M8 17h5" />
+  </Icon>
+);
+
+export const WebhookIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="5" r="2.5" />
+    <circle cx="5.5" cy="17" r="2.5" />
+    <circle cx="18.5" cy="17" r="2.5" />
+    <path d="M10.6 6.9 6.9 14.7" />
+    <path d="M13.4 6.9l3.7 7.8" />
+    <path d="M8 17h8" />
+  </Icon>
+);
+
 export const ChevronRightIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="m9 18 6-6-6-6" />

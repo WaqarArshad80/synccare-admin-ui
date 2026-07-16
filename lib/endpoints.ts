@@ -23,6 +23,7 @@ import type {
   ProgressNote,
   ProgressNoteType,
   SyncResult,
+  WebhookSubscription,
 } from './pccTypes';
 
 /** Result of a successful login: the JWT plus an optional user object if the
@@ -206,6 +207,11 @@ export const medicationsApi = {
     api.post<SyncResult>(`/syncare/pcc/${orgUuid}/medications/facility/${facId}/sync`, undefined, {
       params,
     }),
+
+  /** POST /syncare/pcc/{orgUuid}/medications/sync-all → sync every facility's
+   *  medications for the org. `patientStatus` filters which patients are synced. */
+  syncAll: (orgUuid: string, params?: { patientStatus?: string }) =>
+    api.post<SyncResult>(`/syncare/pcc/${orgUuid}/medications/sync-all`, undefined, { params }),
 };
 
 export const observationsApi = {
@@ -219,6 +225,12 @@ export const observationsApi = {
   /** POST /syncare/pcc/{orgUuid}/observations/patient/{patientId}/sync */
   syncPatient: (orgUuid: string, patientId: number) =>
     api.post<SyncResult>(`/syncare/pcc/${orgUuid}/observations/patient/${patientId}/sync`),
+
+  /** POST /syncare/pcc/{orgUuid}/observations/sync-all → sync every facility's
+   *  observations for the org. `patientStatus` filters which patients are synced;
+   *  `latest` limits the sync to each patient's most recent observations. */
+  syncAll: (orgUuid: string, params?: { patientStatus?: string; latest?: boolean }) =>
+    api.post<SyncResult>(`/syncare/pcc/${orgUuid}/observations/sync-all`, undefined, { params }),
 };
 
 export const progressNotesApi = {
@@ -229,4 +241,21 @@ export const progressNotesApi = {
   /** GET /syncare/{orgUuid}/progress-note-types → note types from DB. */
   types: (orgUuid: string) =>
     api.get<ProgressNoteType[]>(`/syncare/${orgUuid}/progress-note-types`),
+
+  /** POST /syncare/{orgUuid}/pcc/progress-notes/sync-all → sync every facility's
+   *  progress notes for the org. `patientStatus` filters which patients are
+   *  synced; `startDate`/`endDate` bound the notes' date range. */
+  syncAll: (
+    orgUuid: string,
+    params?: { patientStatus?: string; startDate?: string; endDate?: string },
+  ) =>
+    api.post<SyncResult>(`/syncare/${orgUuid}/pcc/progress-notes/sync-all`, undefined, { params }),
+};
+
+export const webhooksApi = {
+  /** GET /syncare/pcc/webhooks/subscriptions → the app's webhook subscriptions. */
+  subscriptions: (applicationName = 'syncare') =>
+    api.get<WebhookSubscription[]>('/syncare/pcc/webhooks/subscriptions', {
+      params: { applicationName },
+    }),
 };
