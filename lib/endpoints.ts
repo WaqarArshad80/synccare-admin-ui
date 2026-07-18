@@ -298,6 +298,20 @@ export const progressNotesApi = {
     params?: { patientStatus?: string; startDate?: string; endDate?: string },
   ) =>
     api.post<SyncResult>(`/syncare/${orgUuid}/pcc/progress-notes/sync-all`, undefined, { params }),
+
+  /** POST /syncare/{orgUuid}/pcc/progress-notes/facility/{facId}/sync-all → sync
+   *  progress notes for every patient in a facility. `patientStatus` filters which
+   *  patients are synced; `startDate`/`endDate` bound the notes' date range. */
+  syncFacility: (
+    orgUuid: string,
+    facId: number,
+    params?: { patientStatus?: string; startDate?: string; endDate?: string },
+  ) =>
+    api.post<SyncResult>(
+      `/syncare/${orgUuid}/pcc/progress-notes/facility/${facId}/sync-all`,
+      undefined,
+      { params },
+    ),
 };
 
 export const webhooksApi = {
