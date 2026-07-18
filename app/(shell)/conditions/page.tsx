@@ -5,16 +5,10 @@ import { Topbar } from '@/components/shell/Topbar';
 import { SyncButton } from '@/components/pcc/SyncButton';
 import { useOrg } from '@/lib/orgContext';
 import { useApi } from '@/lib/useApi';
-import { facilitiesApi, medicationsApi } from '@/lib/endpoints';
+import { conditionsApi, facilitiesApi } from '@/lib/endpoints';
 
-// Values the sync endpoints accept for their ?patientStatus filter.
-const PATIENT_STATUSES = ['Current', 'New', 'Discharged'];
-
-export default function MedicationsPage() {
+export default function ConditionsPage() {
   const { orgs, org, orgUuid, loading: orgsLoading, selectOrg } = useOrg();
-  // patientStatus filters which patients get their medications synced. Sent as
-  // the ?patientStatus query param on the sync endpoints.
-  const [patientStatus, setPatientStatus] = useState('Current');
   const [facId, setFacId] = useState<number | null>(null);
 
   // Facilities for the selected org — reloads whenever the org changes.
@@ -40,36 +34,27 @@ export default function MedicationsPage() {
   return (
     <>
       <Topbar
-        title="Medications"
+        title="Conditions"
         crumbs={[{ label: 'PCC' }]}
         actions={
-          orgUuid && (
-            <span style={{ display: 'inline-flex', gap: 'var(--space-2)' }}>
-              {facId != null && (
-                <SyncButton
-                  label="Sync facility from PCC"
-                  variant="primary"
-                  run={() => medicationsApi.syncFacilityAll(orgUuid, facId, { patientStatus })}
-                />
-              )}
-              <SyncButton
-                label="Sync all facilities"
-                variant="secondary"
-                run={() => medicationsApi.syncAll(orgUuid, { patientStatus })}
-              />
-            </span>
+          orgUuid &&
+          facId != null && (
+            <SyncButton
+              label="Sync all from PCC"
+              variant="primary"
+              run={() => conditionsApi.syncFacility(orgUuid, facId)}
+            />
           )
         }
       />
       <main className="content">
-        {/* Org + facility pickers. The facility sync maps into {orgUuid}/{facId} for
-            POST /syncare/pcc/{orgUuid}/medications/facility/{facId}/sync-all; the
-            org-wide sync hits POST /syncare/pcc/{orgUuid}/medications/sync-all. */}
+        {/* Org + facility pickers — mapped into {orgUuid} and {facId} for
+            POST /syncare/pcc/conditions/{orgUuid}/facility/{facId}/sync-all. */}
         <div className="toolbar">
           <div className="field" style={{ minWidth: 240 }}>
-            <label htmlFor="med-org">Organization</label>
+            <label htmlFor="cond-org">Organization</label>
             <select
-              id="med-org"
+              id="cond-org"
               className="input"
               value={org?.id ?? ''}
               disabled={orgsLoading || orgs.length === 0}
@@ -87,9 +72,9 @@ export default function MedicationsPage() {
           </div>
 
           <div className="field" style={{ minWidth: 240 }}>
-            <label htmlFor="med-fac">Facility (for facility sync)</label>
+            <label htmlFor="cond-fac">Facility</label>
             <select
-              id="med-fac"
+              id="cond-fac"
               className="input"
               value={facId ?? ''}
               disabled={!orgUuid || facLoading}
@@ -112,41 +97,21 @@ export default function MedicationsPage() {
             </select>
           </div>
 
-          <div className="field" style={{ minWidth: 160 }}>
-            <label htmlFor="med-status">Patient status (for sync)</label>
-            <select
-              id="med-status"
-              className="input"
-              value={patientStatus}
-              onChange={(e) => setPatientStatus(e.target.value)}
-            >
-              {PATIENT_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {orgUuid && (
+          {orgUuid && facId != null && (
             <span className="sync-note" style={{ alignSelf: 'end', paddingBottom: 8 }}>
-              orgUuid = <code>{orgUuid}</code>
-              {facId != null && (
-                <>
-                  {' · '}facId = <code>{facId}</code>
-                </>
-              )}
+              orgUuid = <code>{orgUuid}</code> · facId = <code>{facId}</code>
             </span>
           )}
         </div>
 
         {!orgUuid ? (
-          <div className="state">Select an organization to sync its medications.</div>
+          <div className="state">Select an organization to sync its conditions.</div>
+        ) : facId == null ? (
+          <div className="state">Choose a facility to sync its conditions.</div>
         ) : (
           <div className="state">
-            <strong>Sync facility</strong> pulls medications for every patient in the
-            selected facility. <strong>Sync all facilities</strong> pulls them for the
-            whole organization (patient status <code>{patientStatus}</code>).
+            Use “Sync all from PCC” to pull conditions for every patient in this
+            facility.
           </div>
         )}
       </main>

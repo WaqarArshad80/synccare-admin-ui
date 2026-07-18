@@ -7,7 +7,10 @@ import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/Button';
 import { OrgSwitcher } from '@/components/shell/OrgSwitcher';
 import {
+  AllergyIcon,
+  ApiErrorIcon,
   BuildingIcon,
+  ConditionIcon,
   ChevronRightIcon,
   DashboardIcon,
   FacilityIcon,
@@ -47,6 +50,8 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
     items: [
       { href: '/facilities', label: 'Facilities', Icon: FacilityIcon },
       { href: '/patients', label: 'Patients', Icon: PatientIcon },
+      { href: '/allergies', label: 'Allergies', Icon: AllergyIcon },
+      { href: '/conditions', label: 'Conditions', Icon: ConditionIcon },
       { href: '/medications', label: 'Medications', Icon: PillIcon },
       { href: '/observations', label: 'Observations', Icon: ObservationIcon },
       { href: '/progress-notes', label: 'Progress Notes', Icon: NotesIcon },
@@ -65,7 +70,10 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   },
   {
     label: 'System',
-    items: [{ href: '/settings', label: 'Settings', Icon: SettingsIcon }],
+    items: [
+      { href: '/api-errors', label: 'API Errors', Icon: ApiErrorIcon },
+      { href: '/settings', label: 'Settings', Icon: SettingsIcon },
+    ],
   },
 ];
 

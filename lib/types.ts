@@ -88,4 +88,6 @@ export interface UpdateUserInput {
   lastName: string;
   organizationId: string;
   role?: string;
+  /** Only sent when the admin is changing the user's password. */
+  password?: string;
 }

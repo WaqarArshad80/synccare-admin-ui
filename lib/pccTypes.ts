@@ -111,6 +111,17 @@ export interface ProgressNoteType {
 /** Sync endpoints return either a plain message or a map of counts. */
 export type SyncResult = string | Record<string, number>;
 
+/** A PCC API call that failed and is queued for retry (GET /pending-api-calls). */
+export interface PendingApiCall {
+  id?: string;
+  method?: string;
+  url?: string;
+  reason?: string;
+  organizationId?: string;
+  orgUuid?: string;
+  createdAt?: string;
+}
+
 /** One org's subscription state within a webhook subscription. */
 export interface WebhookOrgSubscription {
   action?: string;

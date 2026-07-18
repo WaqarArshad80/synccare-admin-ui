@@ -3,10 +3,10 @@ import { dirname } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Where the Next server forwards proxied API calls. Server-side only (no
-// NEXT_PUBLIC_ prefix) — the browser never sees this and only ever talks to the
-// same-origin `/backend` prefix, which sidesteps the backend's missing CORS.
-const API_PROXY_TARGET = process.env.API_PROXY_TARGET ?? 'http://localhost:4080';
+// The same-origin API proxy lives in app/backend/[...path]/route.ts (a Node
+// route handler with no socket timeout) rather than a `rewrites()` entry, so
+// that multi-minute sync calls don't hit undici's ~5-minute proxy timeout and
+// get reset. Set API_PROXY_TARGET to point it at the backend.
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -14,14 +14,6 @@ const nextConfig = {
   // Pin the file-tracing root to this project (a stray lockfile in $HOME was
   // being picked up as the root otherwise).
   outputFileTracingRoot: __dirname,
-  async rewrites() {
-    return [
-      {
-        source: '/backend/:path*',
-        destination: `${API_PROXY_TARGET}/:path*`,
-      },
-    ];
-  },
 };
 
 export default nextConfig;

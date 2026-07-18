@@ -32,12 +32,13 @@ export function UserFormDialog({ user, defaultOrganizationId, onClose, onSaved }
   const [submitting, setSubmitting] = useState(false);
   const firstRef = useRef<HTMLInputElement>(null);
 
-  // Organization picker options, from GET /organizations. Value = org.id (the
-  // canonical resource id); label shows name + PCC code for recognition.
+  // Organization picker options, from GET /organizations. Value = pccOrgUuid (the
+  // `orgUuid` the backend keys users by, same as the PCC screens); label shows
+  // name + PCC code for recognition.
   const orgFetcher = useCallback(() => organizationsApi.list(), []);
   const { data: orgs, loading: orgsLoading, error: orgsError } = useApi(orgFetcher);
   const orgOptions = (orgs ?? []).map((o) => ({
-    value: o.id,
+    value: o.pccOrgUuid,
     label: `${o.name} · ${o.pccOrgCode}`,
   }));
   // Preserve a current value that isn't in the list (e.g. a legacy id like ORG001).
@@ -66,11 +67,14 @@ export function UserFormDialog({ user, defaultOrganizationId, onClose, onSaved }
         email: email.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        organizationId: organizationId.trim(),
+        // The backend expects the org's UUID in canonical all-caps form
+        // (e.g. 67EFB7C2-5CAD-481E-A712-421AECF52FFC).
+        organizationId: organizationId.trim().toUpperCase(),
         role,
       };
       const saved = isEdit
-        ? await usersApi.update(user!.id, base)
+        ? // On edit the password is optional — only send it when the admin typed one.
+          await usersApi.update(user!.id, password ? { ...base, password } : base)
         : await usersApi.create({ ...base, password });
       onSaved(saved);
     } catch (err) {
@@ -138,21 +142,24 @@ export function UserFormDialog({ user, defaultOrganizationId, onClose, onSaved }
             />
           </div>
 
-          {!isEdit && (
-            <div className="field">
-              <label htmlFor="u-pass">Password * (min 6 characters)</label>
-              <input
-                id="u-pass"
-                type="password"
-                className="input"
-                required
-                minLength={6}
-                autoComplete="new-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          )}
+          <div className="field">
+            <label htmlFor="u-pass">
+              {isEdit
+                ? 'New password (leave blank to keep current)'
+                : 'Password * (min 6 characters)'}
+            </label>
+            <input
+              id="u-pass"
+              type="password"
+              className="input"
+              required={!isEdit}
+              minLength={password ? 6 : undefined}
+              autoComplete="new-password"
+              placeholder={isEdit ? '••••••' : undefined}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
             <div className="field">

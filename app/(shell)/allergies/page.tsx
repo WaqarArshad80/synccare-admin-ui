@@ -5,18 +5,16 @@ import { Topbar } from '@/components/shell/Topbar';
 import { SyncButton } from '@/components/pcc/SyncButton';
 import { useOrg } from '@/lib/orgContext';
 import { useApi } from '@/lib/useApi';
-import { facilitiesApi, observationsApi } from '@/lib/endpoints';
+import { allergiesApi, facilitiesApi } from '@/lib/endpoints';
 
 // Values the sync endpoints accept for their ?patientStatus filter.
 const PATIENT_STATUSES = ['Current', 'New', 'Discharged'];
 
-export default function ObservationsPage() {
+export default function AllergiesPage() {
   const { orgs, org, orgUuid, loading: orgsLoading, selectOrg } = useOrg();
-  // patientStatus filters which patients get their observations synced; latest
-  // limits the sync to each patient's most recent observations. Both are sent as
-  // query params on the sync endpoints.
+  // patientStatus filters which patients get their allergies synced. Sent as the
+  // ?patientStatus query param on the sync endpoints.
   const [patientStatus, setPatientStatus] = useState('Current');
-  const [latest, setLatest] = useState(false);
   const [facId, setFacId] = useState<number | null>(null);
 
   // Facilities for the selected org — reloads whenever the org changes.
@@ -42,7 +40,7 @@ export default function ObservationsPage() {
   return (
     <>
       <Topbar
-        title="Observations"
+        title="Allergies"
         crumbs={[{ label: 'PCC' }]}
         actions={
           orgUuid && (
@@ -51,29 +49,27 @@ export default function ObservationsPage() {
                 <SyncButton
                   label="Sync facility from PCC"
                   variant="primary"
-                  run={() =>
-                    observationsApi.syncFacility(orgUuid, facId, { patientStatus, latest })
-                  }
+                  run={() => allergiesApi.syncFacility(orgUuid, facId, { patientStatus })}
                 />
               )}
               <SyncButton
                 label="Sync all facilities"
                 variant="secondary"
-                run={() => observationsApi.syncAll(orgUuid, { patientStatus, latest })}
+                run={() => allergiesApi.syncAll(orgUuid, { patientStatus })}
               />
             </span>
           )
         }
       />
       <main className="content">
-        {/* Org + facility pickers. The facility sync maps into {orgUuid}/{facId}
-            for POST /syncare/pcc/{orgUuid}/observations/facility/{facId}/sync-all;
-            the org-wide sync hits POST /syncare/pcc/{orgUuid}/observations/sync-all. */}
+        {/* Org + facility pickers. The facility sync maps into {orgUuid}/{facId} for
+            POST /syncare/allergies/pcc/{orgUuid}/facility/{facId}/sync-all; the
+            org-wide sync hits POST /syncare/allergies/sync-all-allergies/{orgUuid}. */}
         <div className="toolbar">
           <div className="field" style={{ minWidth: 240 }}>
-            <label htmlFor="obs-org">Organization</label>
+            <label htmlFor="alg-org">Organization</label>
             <select
-              id="obs-org"
+              id="alg-org"
               className="input"
               value={org?.id ?? ''}
               disabled={orgsLoading || orgs.length === 0}
@@ -91,9 +87,9 @@ export default function ObservationsPage() {
           </div>
 
           <div className="field" style={{ minWidth: 240 }}>
-            <label htmlFor="obs-fac">Facility (for facility sync)</label>
+            <label htmlFor="alg-fac">Facility (for facility sync)</label>
             <select
-              id="obs-fac"
+              id="alg-fac"
               className="input"
               value={facId ?? ''}
               disabled={!orgUuid || facLoading}
@@ -117,9 +113,9 @@ export default function ObservationsPage() {
           </div>
 
           <div className="field" style={{ minWidth: 160 }}>
-            <label htmlFor="obs-status">Patient status (for sync)</label>
+            <label htmlFor="alg-status">Patient status (for sync)</label>
             <select
-              id="obs-status"
+              id="alg-status"
               className="input"
               value={patientStatus}
               onChange={(e) => setPatientStatus(e.target.value)}
@@ -130,19 +126,6 @@ export default function ObservationsPage() {
                 </option>
               ))}
             </select>
-          </div>
-
-          <div className="field">
-            <label htmlFor="obs-latest">Latest only</label>
-            <label className="checkbox" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, height: 38 }}>
-              <input
-                id="obs-latest"
-                type="checkbox"
-                checked={latest}
-                onChange={(e) => setLatest(e.target.checked)}
-              />
-              <span className="text-muted">Most recent observations only</span>
-            </label>
           </div>
 
           {orgUuid && (
@@ -158,13 +141,12 @@ export default function ObservationsPage() {
         </div>
 
         {!orgUuid ? (
-          <div className="state">Select an organization to sync its observations.</div>
+          <div className="state">Select an organization to sync its allergies.</div>
         ) : (
           <div className="state">
-            <strong>Sync facility</strong> pulls observations for every patient in the
+            <strong>Sync facility</strong> pulls allergies for every patient in the
             selected facility. <strong>Sync all facilities</strong> pulls them for the
-            whole organization (patient status <code>{patientStatus}</code>, latest{' '}
-            <code>{String(latest)}</code>).
+            whole organization (patient status <code>{patientStatus}</code>).
           </div>
         )}
       </main>

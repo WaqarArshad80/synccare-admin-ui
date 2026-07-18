@@ -20,6 +20,7 @@ import type {
   Observation,
   Patient,
   PccCollection,
+  PendingApiCall,
   ProgressNote,
   ProgressNoteType,
   SyncResult,
@@ -88,18 +89,19 @@ export const authApi = {
 };
 
 export const organizationsApi = {
-  /** GET /organizations → all organizations. */
-  list: () => api.get<Organization[]>('/organizations'),
+  /** GET /syncare/organizations → all organizations. */
+  list: () => api.get<Organization[]>('/syncare/organizations'),
 
-  get: (id: string) => api.get<Organization>(`/organizations/${id}`),
+  get: (id: string) => api.get<Organization>(`/syncare/organizations/${id}`),
 
-  /** POST /organizations → create a new organization. */
-  create: (data: CreateOrganizationInput) => api.post<Organization>('/organizations', data),
+  /** POST /syncare/organizations → create a new organization. */
+  create: (data: CreateOrganizationInput) =>
+    api.post<Organization>('/syncare/organizations', data),
 };
 
 export const appConfigApi = {
-  /** GET /app-config/{id} → a runtime config document. */
-  get: (id: string) => api.get<AppConfig>(`/app-config/${id}`),
+  /** GET /syncare/app-config/{id} → a runtime config document. */
+  get: (id: string) => api.get<AppConfig>(`/syncare/app-config/${id}`),
 };
 
 export const usersApi = {
@@ -175,6 +177,24 @@ export const allergiesApi = {
   /** POST /syncare/allergies/pcc/{orgUuid}/patient/{patientId}/sync */
   syncPatient: (orgUuid: string, patientId: number) =>
     api.post<SyncResult>(`/syncare/allergies/pcc/${orgUuid}/patient/${patientId}/sync`),
+
+  /** POST /syncare/allergies/sync-all-allergies/{orgUuid}?patientStatus=… →
+   *  sync allergies for every facility's patients in the org (optionally filtered
+   *  by patient status). */
+  syncAll: (orgUuid: string, params?: { patientStatus?: string }) =>
+    api.post<SyncResult>(`/syncare/allergies/sync-all-allergies/${orgUuid}`, undefined, {
+      params,
+    }),
+
+  /** POST /syncare/allergies/pcc/{orgUuid}/facility/{facId}/sync-all?patientStatus=…
+   *  → sync allergies for every patient in a facility (optionally filtered by
+   *  patient status). */
+  syncFacility: (orgUuid: string, facId: number, params?: { patientStatus?: string }) =>
+    api.post<SyncResult>(
+      `/syncare/allergies/pcc/${orgUuid}/facility/${facId}/sync-all`,
+      undefined,
+      { params },
+    ),
 };
 
 export const conditionsApi = {
@@ -189,6 +209,11 @@ export const conditionsApi = {
     api.post<PccCollection<Condition>>(
       `/syncare/pcc/conditions/${orgUuid}/patient/${patientId}/sync`,
     ),
+
+  /** POST /syncare/pcc/conditions/{orgUuid}/facility/{facId}/sync-all → sync
+   *  conditions for every patient in a facility. */
+  syncFacility: (orgUuid: string, facId: number) =>
+    api.post<SyncResult>(`/syncare/pcc/conditions/${orgUuid}/facility/${facId}/sync-all`),
 };
 
 export const medicationsApi = {
@@ -207,6 +232,16 @@ export const medicationsApi = {
     api.post<SyncResult>(`/syncare/pcc/${orgUuid}/medications/facility/${facId}/sync`, undefined, {
       params,
     }),
+
+  /** POST /syncare/pcc/{orgUuid}/medications/facility/{facId}/sync-all?patientStatus=…
+   *  → sync medications for every patient in a facility (optionally filtered by
+   *  patient status). */
+  syncFacilityAll: (orgUuid: string, facId: number, params?: { patientStatus?: string }) =>
+    api.post<SyncResult>(
+      `/syncare/pcc/${orgUuid}/medications/facility/${facId}/sync-all`,
+      undefined,
+      { params },
+    ),
 
   /** POST /syncare/pcc/{orgUuid}/medications/sync-all → sync every facility's
    *  medications for the org. `patientStatus` filters which patients are synced. */
@@ -231,6 +266,19 @@ export const observationsApi = {
    *  `latest` limits the sync to each patient's most recent observations. */
   syncAll: (orgUuid: string, params?: { patientStatus?: string; latest?: boolean }) =>
     api.post<SyncResult>(`/syncare/pcc/${orgUuid}/observations/sync-all`, undefined, { params }),
+
+  /** POST /syncare/pcc/{orgUuid}/observations/facility/{facId}/sync-all → sync
+   *  observations for every patient in a facility. */
+  syncFacility: (
+    orgUuid: string,
+    facId: number,
+    params?: { patientStatus?: string; latest?: boolean },
+  ) =>
+    api.post<SyncResult>(
+      `/syncare/pcc/${orgUuid}/observations/facility/${facId}/sync-all`,
+      undefined,
+      { params },
+    ),
 };
 
 export const progressNotesApi = {
@@ -258,4 +306,9 @@ export const webhooksApi = {
     api.get<WebhookSubscription[]>('/syncare/pcc/webhooks/subscriptions', {
       params: { applicationName },
     }),
+};
+
+export const pendingApiCallsApi = {
+  /** GET /syncare/pending-api-calls → PCC calls that failed and are queued for retry. */
+  list: () => api.get<PendingApiCall[]>('/syncare/pending-api-calls'),
 };
