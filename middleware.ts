@@ -10,12 +10,12 @@ import { isAllowedRole } from './lib/access';
 
 const PUBLIC_PATHS = ['/login'];
 
-/** True only if the cookie holds a non-expired superadmin JWT. */
+/** True if the cookie holds a superadmin JWT. Token expiry is intentionally not
+ *  enforced — session timeout is disabled, so the app never logs out on its own. */
 function isAuthorized(token: string | undefined): boolean {
   if (!token) return false;
   const claims = decodeJwt(token);
   if (!claims) return false;
-  if (claims.exp && claims.exp * 1000 <= Date.now()) return false;
   const role = claims.role ?? (Array.isArray(claims.roles) ? claims.roles[0] : claims.roles);
   return isAllowedRole(typeof role === 'string' ? role : undefined);
 }

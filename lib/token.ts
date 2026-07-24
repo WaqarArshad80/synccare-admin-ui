@@ -14,12 +14,17 @@ export function getToken(): string | null {
   return window.localStorage.getItem(TOKEN_KEY);
 }
 
+// ~10 years — effectively "never expires", so the cookie survives browser
+// restarts and the app never logs out on its own (session timeout is disabled).
+const TOKEN_COOKIE_MAX_AGE = 60 * 60 * 24 * 365 * 10;
+
 export function setToken(token: string): void {
   if (typeof window === 'undefined') return;
   window.localStorage.setItem(TOKEN_KEY, token);
-  // Session cookie (cleared when the browser closes); SameSite=Lax is enough
-  // for a same-site admin app. Add `Secure` in production over HTTPS.
-  document.cookie = `${TOKEN_COOKIE}=${encodeURIComponent(token)}; Path=/; SameSite=Lax`;
+  // Persistent cookie (survives browser close) mirroring the persisted
+  // localStorage token; SameSite=Lax is enough for a same-site admin app. Add
+  // `Secure` in production over HTTPS.
+  document.cookie = `${TOKEN_COOKIE}=${encodeURIComponent(token)}; Path=/; Max-Age=${TOKEN_COOKIE_MAX_AGE}; SameSite=Lax`;
 }
 
 export function clearToken(): void {

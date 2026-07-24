@@ -11,6 +11,7 @@ import {
   ApiErrorIcon,
   BuildingIcon,
   ConditionIcon,
+  NoteTypeIcon,
   ChevronRightIcon,
   DashboardIcon,
   FacilityIcon,
@@ -55,6 +56,7 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
       { href: '/medications', label: 'Medications', Icon: PillIcon },
       { href: '/observations', label: 'Observations', Icon: ObservationIcon },
       { href: '/progress-notes', label: 'Progress Notes', Icon: NotesIcon },
+      { href: '/progress-note-types', label: 'Note Types', Icon: NoteTypeIcon },
     ],
   },
   {
@@ -64,7 +66,10 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
         href: '/webhooks',
         label: 'Webhooks',
         Icon: WebhookIcon,
-        children: [{ href: '/webhooks/subscriptions', label: 'Subscribed' }],
+        children: [
+          { href: '/webhooks/subscriptions', label: 'Subscribed' },
+          { href: '/webhooks/logs', label: 'Logs' },
+        ],
       },
     ],
   },

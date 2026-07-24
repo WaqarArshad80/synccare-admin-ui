@@ -5,7 +5,7 @@
 // bottom of this file / in feature modules so components never touch fetch
 // directly.
 
-import { clearToken, getToken } from './token';
+import { getToken } from './token';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
 
@@ -101,13 +101,9 @@ export async function apiFetchWithResponse<T>(
     throw new ApiError(0, 'Network error — could not reach the API.', err);
   }
 
-  // 401 → token is invalid/expired. Clear it and bounce to login.
-  if (res.status === 401 && !skipAuth) {
-    clearToken();
-    if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-      window.location.href = '/login';
-    }
-  }
+  // Session timeout is disabled: a 401 is surfaced as a normal error (below)
+  // rather than clearing the token and bouncing to /login, so the app never
+  // logs the user out on its own. Use the sidebar's Log out button to sign out.
 
   const isJson = res.headers.get('content-type')?.includes('application/json');
   const payload = isJson ? await res.json().catch(() => null) : await res.text();

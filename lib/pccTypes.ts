@@ -111,6 +111,34 @@ export interface ProgressNoteType {
 /** Sync endpoints return either a plain message or a map of counts. */
 export type SyncResult = string | Record<string, number>;
 
+/** MongoDB extended-JSON wrappers the backend sometimes emits. */
+type MongoDate = { $date?: string };
+type MongoId = { $oid?: string };
+
+/** A stored PCC webhook delivery (GET /syncare/webhook-logs). Dates may arrive
+ *  as plain ISO strings or Mongo `{ $date }` wrappers. */
+export interface WebhookLog {
+  _id?: MongoId | string;
+  messageId?: string;
+  eventType?: string;
+  eventSubType?: string;
+  /** The raw event JSON, stored as a string. */
+  payload?: string;
+  patientId?: number;
+  resourceId?: string;
+  orgId?: number;
+  orgUuid?: string;
+  facId?: number;
+  status?: string;
+  processingDetails?: string;
+  receivedAt?: MongoDate | string;
+  processedAt?: MongoDate | string;
+  messageDate?: MongoDate | string;
+  eventDate?: MongoDate | string;
+  contentType?: string;
+  sourceIp?: string;
+}
+
 /** A PCC API call that failed and is queued for retry (GET /pending-api-calls). */
 export interface PendingApiCall {
   id?: string;

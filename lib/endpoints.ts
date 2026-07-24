@@ -24,6 +24,7 @@ import type {
   ProgressNote,
   ProgressNoteType,
   SyncResult,
+  WebhookLog,
   WebhookSubscription,
 } from './pccTypes';
 
@@ -290,6 +291,13 @@ export const progressNotesApi = {
   types: (orgUuid: string) =>
     api.get<ProgressNoteType[]>(`/syncare/${orgUuid}/progress-note-types`),
 
+  /** POST /syncare/pcc/{orgUuid}/progress-note-types/facility/{facId}/sync → sync
+   *  a facility's progress-note types from PCC. */
+  syncTypesFacility: (orgUuid: string, facId: number) =>
+    api.post<SyncResult>(
+      `/syncare/pcc/${orgUuid}/progress-note-types/facility/${facId}/sync`,
+    ),
+
   /** POST /syncare/{orgUuid}/pcc/progress-notes/sync-all → sync every facility's
    *  progress notes for the org. `patientStatus` filters which patients are
    *  synced; `startDate`/`endDate` bound the notes' date range. */
@@ -320,6 +328,16 @@ export const webhooksApi = {
     api.get<WebhookSubscription[]>('/syncare/pcc/webhooks/subscriptions', {
       params: { applicationName },
     }),
+
+  /** GET /syncare/webhook-logs → stored webhook deliveries. All filters are
+   *  optional and combinable (orgUuid, eventType, status, patientId, facId). */
+  logs: (params?: {
+    orgUuid?: string;
+    eventType?: string;
+    status?: string;
+    patientId?: number;
+    facId?: number;
+  }) => api.get<WebhookLog[]>('/syncare/webhook-logs', { params }),
 };
 
 export const pendingApiCallsApi = {

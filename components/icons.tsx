@@ -132,6 +132,15 @@ export const WebhookIcon = (p: IconProps) => (
   </Icon>
 );
 
+export const NoteTypeIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 6h10" />
+    <path d="M4 12h10" />
+    <path d="M4 18h6" />
+    <path d="m16 15 2.5 2.5L22 14" />
+  </Icon>
+);
+
 export const ConditionIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M11 3a1 1 0 0 0-1 1v3H7a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h3v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3h3a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-3V4a1 1 0 0 0-1-1z" />

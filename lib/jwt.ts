@@ -39,11 +39,11 @@ export function decodeJwt(token: string): JwtClaims | null {
   }
 }
 
-/** True if the token carries an `exp` that is already in the past. */
-export function isJwtExpired(token: string): boolean {
-  const claims = decodeJwt(token);
-  if (!claims?.exp) return false; // no exp → treat as non-expiring
-  return claims.exp * 1000 <= Date.now();
+/** Session timeout is disabled — the app never expires a token client-side, so
+ *  this always reports "not expired". (Previously compared the JWT `exp` claim
+ *  against the clock.) */
+export function isJwtExpired(_token: string): boolean {
+  return false;
 }
 
 function firstRole(claims: JwtClaims): string {
